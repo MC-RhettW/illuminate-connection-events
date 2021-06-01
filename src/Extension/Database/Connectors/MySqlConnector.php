@@ -1,8 +1,8 @@
 <?php
-namespace ShiftOneLabs\LaravelDbEvents\Extension\Database\Connectors;
+namespace MCDev\IlluminateConnectionEvents\Extension\Database\Connectors;
 
-use ShiftOneLabs\LaravelDbEvents\Traits\ConnectorConnectTrait;
 use Illuminate\Database\Connectors\MySqlConnector as BaseMySqlConnector;
+use MCDev\IlluminateConnectionEvents\Traits\ConnectorConnectTrait;
 
 class MySqlConnector extends BaseMySqlConnector
 {

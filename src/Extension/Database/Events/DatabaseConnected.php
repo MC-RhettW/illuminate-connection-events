@@ -1,6 +1,8 @@
 <?php
-namespace ShiftOneLabs\LaravelDbEvents\Extension\Database\Events;
+namespace MCDev\IlluminateConnectionEvents\Extension\Database\Events;
 
+use Illuminate\Database\Connectors\Connector;
+use MCDev\IlluminateConnectionEvents\Traits\ConnectorConnectTrait;
 use PDO;
 
 class DatabaseConnected extends ConnectorEvent
@@ -15,19 +17,19 @@ class DatabaseConnected extends ConnectorEvent
     /**
      * The connected PDO connection.
      *
-     * @var \PDO
+     * @var PDO
      */
     public $pdo;
 
     /**
      * Create a new event instance.
      *
-     * @param \Illuminate\Database\Connectors\Connector  $connector
-     * @param string  $name
-     * @param array  $config
-     * @param \PDO  $pdo
+     * @param Connector|ConnectorConnectTrait $connector
+     * @param string $name
+     * @param array $config
+     * @param PDO $pdo
      */
-    public function __construct($connector, $name, $config, PDO $pdo)
+    public function __construct($connector, string $name, array $config, PDO $pdo)
     {
         parent::__construct($connector, $name);
 

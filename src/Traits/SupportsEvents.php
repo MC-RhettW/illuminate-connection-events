@@ -1,5 +1,5 @@
 <?php
-namespace ShiftOneLabs\LaravelDbEvents\Traits;
+namespace MCDev\IlluminateConnectionEvents\Traits;
 
 use Illuminate\Events\Dispatcher;
 
@@ -9,16 +9,16 @@ trait SupportsEvents
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Events\Dispatcher
+     * @var Dispatcher
      */
     protected $events;
 
     /**
      * Get the event dispatcher used by the object.
      *
-     * @return \Illuminate\Events\Dispatcher
+     * @return Dispatcher
      */
-    public function getEventDispatcher()
+    public function getEventDispatcher(): Dispatcher
     {
         return $this->events;
     }
@@ -26,11 +26,7 @@ trait SupportsEvents
     /**
      * Set the event dispatcher instance on the object.
      *
-     * In order to support both Laravel 4 and Laravel 5, the events
-     * parameter is typehinted to the implementation and not the
-     * interface, as the interface doesn't exist in Laravel 4.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
+     * @param Dispatcher $events
      * @return void
      */
     public function setEventDispatcher(Dispatcher $events)
@@ -53,7 +49,7 @@ trait SupportsEvents
      *
      * @return boolean
      */
-    public function usingEvents()
+    public function usingEvents(): bool
     {
         return isset($this->events);
     }
@@ -61,11 +57,11 @@ trait SupportsEvents
     /**
      * Fire the given event for the object.
      *
-     * @param  object  $event
-     * @param  boolean  $halt
+     * @param object $event
+     * @param boolean $halt
      * @return mixed
      */
-    protected function fireEvent($event, $halt = false)
+    protected function fireEvent(object $event, bool $halt = false)
     {
         if (!$this->usingEvents()) {
             return true;

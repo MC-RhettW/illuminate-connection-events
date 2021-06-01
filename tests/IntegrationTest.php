@@ -1,40 +1,44 @@
-<?php
-namespace ShiftOneLabs\LaravelDbEvents\Tests;
+<?php /** @noinspection PhpUnused */
 
-class IntegrationTest extends TestCase
-{
+namespace MCDev\IlluminateConnectionEvents\Tests {
 
-    public function testValidConnectionIsValid()
+    class IntegrationTest extends TestCase
     {
-        $connection = $this->getConnection('valid');
-        $connection->getPdo();
 
-        $this->assertTrue(true, 'Valid connection does not throw an exception.');
-    }
+        public function testValidConnectionIsValid()
+        {
+            $connection = $this->getConnection('valid');
+            $connection->getPdo();
 
-    public function testInvalidConnectionIsInvalid()
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $connection = $this->getConnection('invalid');
-        $connection->getPdo();
-    }
-
-    public function testConnectingEventModifiesConfig()
-    {
-        if (!$this->app->bound('events')) {
-            $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
-            return;
+            $this->assertTrue(true, 'Valid connection does not throw an exception.');
         }
 
-        $this->setExpectedException('InvalidArgumentException');
+        public function testInvalidConnectionIsInvalid()
+        {
+            $this->expectException('InvalidArgumentException');
 
-        $events = $this->app['events'];
-        $events->listen('ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnecting', function ($event) {
-            $event->config = $this->app['config']['database.connections.invalid'];
-        });
+            $connection = $this->getConnection('invalid');
+            $connection->getPdo();
+        }
 
-        $connection = $this->getConnection('valid');
-        $connection->getPdo();
+        public function testConnectingEventModifiesConfig()
+        {
+            if (!$this->app->bound('events')) {
+                $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
+            }
+
+            $this->expectException('InvalidArgumentException');
+
+            $events = $this->app['events'];
+            $events->listen(
+                'MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnecting',
+                function ($event) {
+                    $event->config = $this->app['config']['database.connections.invalid'];
+                }
+            );
+
+            $connection = $this->getConnection('valid');
+            $connection->getPdo();
+        }
     }
 }

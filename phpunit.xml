@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false">
 	<testsuites>
-		<testsuite name="Laravel DB Events Test Suite">
+		<testsuite name="Illuminate Connection Events Test Suite">
 			<directory suffix="Test.php">./tests/</directory>
 		</testsuite>
 	</testsuites>

@@ -1,38 +1,64 @@
 {
-    "name": "shiftonelabs/laravel-db-events",
-    "description": "Add extra database events.",
-    "keywords": ["laravel", "lumen", "database", "events"],
-    "homepage": "https://github.com/shiftonelabs/laravel-db-events",
+    "name": "mcdev/illuminate-connection-events",
+    "description": "Extends available events for Illuminate Database connections.",
+    "keywords": [
+        "laravel",
+        "lumen",
+        "database",
+        "events",
+        "library",
+        "support"
+    ],
+    "homepage": "https://github.com/MC-RhettW/illuminate-connection-events.git",
     "license": "MIT",
+    "version": "dev-1.0",
     "authors": [
         {
+            "name": "Rhett Waldock",
+            "email": "RhettW@MankatoClinic.com",
+            "role": "Maintainer (fork)"
+        },
+        {
             "name": "Patrick Carlo-Hickman",
-            "email": "patrick@shiftonelabs.com"
+            "email": "patrick@shiftonelabs.com",
+            "role": "Developer (upstream)"
         }
     ],
+    "type": "library",
     "support": {
-        "issues": "https://github.com/shiftonelabs/laravel-db-events/issues",
-        "source": "https://github.com/shiftonelabs/laravel-db-events"
+        "issues": "https://collab.devteam.mankatoclinic.com/",
+        "source": "https://github.com/MC-RhettW/illuminate-connection-events"
+    },
+    "config": {
+        "sort-packages": true
     },
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/database": ">=4.1",
-        "illuminate/support": ">=4.1"
+        "php": "^7.2.5|^8.0",
+        "ext-pdo": "*",
+        "illuminate/database": ">=7.3",
+        "illuminate/support": ">=7.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0",
-        "mockery/mockery": "~0.9",
-        "laravel/framework": ">=4.1",
-        "squizlabs/php_codesniffer": "2.*"
+        "phpunit/phpunit": "^8.4|^9.3.3",
+        "mockery/mockery": "~1.3.3|^1.4.2",
+        "laravel/framework": ">=7.3",
+        "squizlabs/php_codesniffer": "~2.9.0|^3.6.0"
     },
     "autoload": {
         "psr-4": {
-            "ShiftOneLabs\\LaravelDbEvents\\": "src/"
+            "MCDev\\IlluminateConnectionEvents\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ShiftOneLabs\\LaravelDbEvents\\Tests\\": "tests/"
+            "MCDev\\IlluminateConnectionEvents\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MCDev\\IlluminateConnectionEvents\\ServiceProvider"
+            ]
         }
     },
     "minimum-stability": "stable"

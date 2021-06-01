@@ -1,9 +1,14 @@
-<?php
-namespace ShiftOneLabs\LaravelDbEvents\Traits;
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
-use ShiftOneLabs\LaravelDbEvents\Exceptions\ConnectingException;
-use ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnected;
-use ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnecting;
+/** @noinspection ALL */
+
+namespace MCDev\IlluminateConnectionEvents\Traits;
+
+use Illuminate\Support\Arr;
+use MCDev\IlluminateConnectionEvents\Exceptions\ConnectingException;
+use MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnected;
+use MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnecting;
+use PDO;
 
 trait ConnectorConnectTrait
 {
@@ -12,18 +17,18 @@ trait ConnectorConnectTrait
     /**
      * Establish a database connection.
      *
-     * @param  array  $config
-     * @return \PDO
+     * @param array $config
+     * @return PDO
      */
-    public function connect(array $config)
+    public function connect(array $config): PDO
     {
-        if ($this->fireEvent(new DatabaseConnecting($this, array_get($config, 'name'), $config), true) === false) {
+        if ($this->fireEvent(new DatabaseConnecting($this, Arr::get($config, 'name'), $config), true) === false) {
             throw new ConnectingException();
         }
 
         $connection = $this->parentConnect($config);
 
-        $this->fireEvent(new DatabaseConnected($this, array_get($config, 'name'), $config, $connection));
+        $this->fireEvent(new DatabaseConnected($this, Arr::get($config, 'name'), $config, $connection));
 
         return $connection;
     }
@@ -31,10 +36,10 @@ trait ConnectorConnectTrait
     /**
      * Call connect on the parent class to establish a database connection.
      *
-     * @param  array  $config
-     * @return \PDO
+     * @param array $config
+     * @return PDO
      */
-    protected function parentConnect(array $config)
+    protected function parentConnect(array $config): PDO
     {
         return parent::connect($config);
     }

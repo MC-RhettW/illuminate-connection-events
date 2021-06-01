@@ -1,146 +1,208 @@
-<?php
-namespace ShiftOneLabs\LaravelDbEvents\Tests;
+<?php /** @noinspection PhpUnused */
 
-use Mockery as m;
-use ShiftOneLabs\LaravelDbEvents\Tests\Stubs\PdoStub;
+/** @noinspection PhpExpressionAlwaysNullInspection */
 
-class EventTest extends TestCase
-{
+namespace MCDev\IlluminateConnectionEvents\Tests {
 
-    public function testMysqlConnectingEventGetsParameters()
+    use Illuminate\Contracts\Container\BindingResolutionException;
+    use MCDev\IlluminateConnectionEvents\Tests\Stubs\PdoStub;
+    use Mockery as m;
+
+    class EventTest extends TestCase
     {
-        $this->driverConnectingEventGetsParameters('mysql');
-    }
 
-    public function testPgsqlConnectingEventGetsParameters()
-    {
-        $this->driverConnectingEventGetsParameters('pgsql');
-    }
-
-    public function testSqliteConnectingEventGetsParameters()
-    {
-        $this->driverConnectingEventGetsParameters('sqlite');
-    }
-
-    public function testSqlsrvConnectingEventGetsParameters()
-    {
-        $this->driverConnectingEventGetsParameters('sqlsrv');
-    }
-
-    public function driverConnectingEventGetsParameters($driver)
-    {
-        if (!$this->app->bound('events')) {
-            $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
-            return;
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testMysqlConnectingEventGetsParameters()
+        {
+            $this->driverConnectingEventGetsParameters('mysql');
         }
 
-        $config = ['name' => $driver];
-
-        $_SERVER['__event.test.DatabaseConnecting'] = null;
-        $events = $this->app['events'];
-        $events->listen('ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnecting', function ($event) {
-            $_SERVER['__event.test.DatabaseConnecting'] = $event;
-        });
-
-        $connector = $this->getPdoStubConnector($driver);
-        $connector->connect($config);
-        $event = $_SERVER['__event.test.DatabaseConnecting'];
-
-        $this->assertInstanceOf('ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnecting', $event);
-        $this->assertSame($connector, $event->connector);
-        $this->assertEquals($driver, $event->connectionName);
-        $this->assertEquals($config, $event->config);
-    }
-
-    public function testMysqlConnectedEventGetsParameters()
-    {
-        $this->driverConnectedEventGetsParameters('mysql');
-    }
-
-    public function testPgsqlConnectedEventGetsParameters()
-    {
-        $this->driverConnectedEventGetsParameters('pgsql');
-    }
-
-    public function testSqliteConnectedEventGetsParameters()
-    {
-        $this->driverConnectedEventGetsParameters('sqlite');
-    }
-
-    public function testSqlsrvConnectedEventGetsParameters()
-    {
-        $this->driverConnectedEventGetsParameters('sqlsrv');
-    }
-
-    public function driverConnectedEventGetsParameters($driver)
-    {
-        if (!$this->app->bound('events')) {
-            $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
-            return;
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testPgsqlConnectingEventGetsParameters()
+        {
+            $this->driverConnectingEventGetsParameters('pgsql');
         }
 
-        $config = ['name' => $driver];
-
-        $_SERVER['__event.test.DatabaseConnected'] = null;
-        $events = $this->app['events'];
-        $events->listen('ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnected', function ($event) {
-            $_SERVER['__event.test.DatabaseConnected'] = $event;
-        });
-
-        $connector = $this->getPdoStubConnector($driver);
-        $connector->connect($config);
-        $event = $_SERVER['__event.test.DatabaseConnected'];
-
-        $this->assertInstanceOf('ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnected', $event);
-        $this->assertSame($connector, $event->connector);
-        $this->assertEquals($driver, $event->connectionName);
-        $this->assertEquals($config, $event->config);
-        $this->assertInstanceOf('ShiftOneLabs\LaravelDbEvents\Tests\Stubs\PdoStub', $event->pdo);
-    }
-
-    public function testMysqlConnectingEventCanModifyConfig()
-    {
-        $this->driverConnectingEventCanModifyConfig('mysql');
-    }
-
-    public function testPgsqlConnectingEventCanModifyConfig()
-    {
-        $this->driverConnectingEventCanModifyConfig('pgsql');
-    }
-
-    public function testSqliteConnectingEventCanModifyConfig()
-    {
-        $this->driverConnectingEventCanModifyConfig('sqlite');
-    }
-
-    public function testSqlsrvConnectingEventCanModifyConfig()
-    {
-        $this->driverConnectingEventCanModifyConfig('sqlsrv');
-    }
-
-    public function driverConnectingEventCanModifyConfig($driver)
-    {
-        if (!$this->app->bound('events')) {
-            $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
-            return;
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testSqliteConnectingEventGetsParameters()
+        {
+            $this->driverConnectingEventGetsParameters('sqlite');
         }
 
-        $events = $this->app['events'];
-        $events->listen('ShiftOneLabs\LaravelDbEvents\Extension\Database\Events\DatabaseConnecting', function ($event) {
-            $event->config['modified'] = true;
-        });
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testSqlsrvConnectingEventGetsParameters()
+        {
+            $this->driverConnectingEventGetsParameters('sqlsrv');
+        }
 
-        $_SERVER['__event.test.parameter'] = [];
-        $connector = $this->getMockedConnector($driver);
-        $connector->shouldReceive('parentConnect')
-            ->with(m::on(function ($config) {
-                $_SERVER['__event.test.parameter'] = $config;
-                return true;
-            }))
-            ->andReturn(new PdoStub());
+        /**
+         * @throws BindingResolutionException
+         */
+        public function driverConnectingEventGetsParameters($driver)
+        {
+            if (!$this->app->bound('events')) {
+                $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
+            }
 
-        $connector->connect(['name' => $driver]);
+            $config = ['name' => $driver];
 
-        $this->assertTrue(array_key_exists('modified', $_SERVER['__event.test.parameter']));
+            $_SERVER['__event.test.DatabaseConnecting'] = null;
+            $events = $this->app['events'];
+            $events->listen(
+                'MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnecting',
+                function ($event) {
+                    $_SERVER['__event.test.DatabaseConnecting'] = $event;
+                }
+            );
+
+            $connector = $this->getPdoStubConnector($driver);
+            $connector->connect($config);
+            $event = $_SERVER['__event.test.DatabaseConnecting'];
+
+            $this->assertInstanceOf(
+                'MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnecting',
+                $event
+            );
+            $this->assertSame($connector, $event->connector);
+            $this->assertEquals($driver, $event->connectionName);
+            $this->assertEquals($config, $event->config);
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testMysqlConnectedEventGetsParameters()
+        {
+            $this->driverConnectedEventGetsParameters('mysql');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testPgsqlConnectedEventGetsParameters()
+        {
+            $this->driverConnectedEventGetsParameters('pgsql');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testSqliteConnectedEventGetsParameters()
+        {
+            $this->driverConnectedEventGetsParameters('sqlite');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testSqlsrvConnectedEventGetsParameters()
+        {
+            $this->driverConnectedEventGetsParameters('sqlsrv');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function driverConnectedEventGetsParameters($driver)
+        {
+            if (!$this->app->bound('events')) {
+                $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
+            }
+
+            $config = ['name' => $driver];
+
+            $_SERVER['__event.test.DatabaseConnected'] = null;
+            $events = $this->app['events'];
+            $events->listen(
+                'MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnected',
+                function ($event) {
+                    $_SERVER['__event.test.DatabaseConnected'] = $event;
+                }
+            );
+
+            $connector = $this->getPdoStubConnector($driver);
+            $connector->connect($config);
+            $event = $_SERVER['__event.test.DatabaseConnected'];
+
+            $this->assertInstanceOf(
+                'MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnected',
+                $event
+            );
+            $this->assertSame($connector, $event->connector);
+            $this->assertEquals($driver, $event->connectionName);
+            $this->assertEquals($config, $event->config);
+            $this->assertInstanceOf('MCDev\IlluminateConnectionEvents\Tests\Stubs\PdoStub', $event->pdo);
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testMysqlConnectingEventCanModifyConfig()
+        {
+            $this->driverConnectingEventCanModifyConfig('mysql');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testPgsqlConnectingEventCanModifyConfig()
+        {
+            $this->driverConnectingEventCanModifyConfig('pgsql');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testSqliteConnectingEventCanModifyConfig()
+        {
+            $this->driverConnectingEventCanModifyConfig('sqlite');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function testSqlsrvConnectingEventCanModifyConfig()
+        {
+            $this->driverConnectingEventCanModifyConfig('sqlsrv');
+        }
+
+        /**
+         * @throws BindingResolutionException
+         */
+        public function driverConnectingEventCanModifyConfig($driver)
+        {
+            if (!$this->app->bound('events')) {
+                $this->markTestSkipped('The Illuminate Event Dispatcher is not available.');
+            }
+
+            $events = $this->app['events'];
+            $events->listen(
+                'MCDev\IlluminateConnectionEvents\Extension\Database\Events\DatabaseConnecting',
+                function ($event) {
+                    $event->config['modified'] = true;
+                }
+            );
+
+            $_SERVER['__event.test.parameter'] = [];
+            $connector = $this->getMockedConnector($driver);
+            $connector->shouldReceive('parentConnect')
+                ->with(m::on(function ($config) {
+                    $_SERVER['__event.test.parameter'] = $config;
+                    return true;
+                }))
+                ->andReturn(new PdoStub());
+
+            $connector->connect(['name' => $driver]);
+
+            $this->assertArrayHasKey('modified', $_SERVER['__event.test.parameter']);
+        }
     }
 }

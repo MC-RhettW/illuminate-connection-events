@@ -1,12 +1,14 @@
 <?php
-namespace ShiftOneLabs\LaravelDbEvents\Extension\Database\Events;
+namespace MCDev\IlluminateConnectionEvents\Extension\Database\Events;
+
+use Illuminate\Database\Connectors\Connector;
 
 abstract class ConnectorEvent
 {
     /**
      * The database connector instance.
      *
-     * @var \Illuminate\Database\Connectors\Connector
+     * @var Connector
      */
     public $connector;
 
@@ -20,10 +22,10 @@ abstract class ConnectorEvent
     /**
      * Create a new event instance.
      *
-     * @param \Illuminate\Database\Connectors\Connector  $connector
-     * @param string  $name
+     * @param Connector $connector
+     * @param string $name
      */
-    public function __construct($connector, $name)
+    public function __construct(Connector $connector, string $name)
     {
         $this->connector = $connector;
         $this->connectionName = $name;

@@ -1,13 +1,15 @@
 <?php
-namespace ShiftOneLabs\LaravelDbEvents\Tests\Stubs;
+namespace MCDev\IlluminateConnectionEvents\Tests\Stubs {
 
-use PDO;
+    use PDO;
 
-class PdoStub extends PDO
-{
-
-    public function __construct()
+    class PdoStub extends PDO
     {
-        //
+
+        /** @noinspection PhpMissingParentConstructorInspection */
+        public function __construct()
+        {
+            //
+        }
     }
 }

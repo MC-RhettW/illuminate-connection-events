@@ -1,5 +1,5 @@
 <?php
-namespace ShiftOneLabs\LaravelDbEvents\Exceptions;
+namespace MCDev\IlluminateConnectionEvents\Exceptions;
 
 use RuntimeException;
 

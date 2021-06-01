@@ -1,100 +1,112 @@
-<?php
+<?php /** @noinspection PhpUndefinedMethodInspection */
 
-namespace ShiftOneLabs\LaravelDbEvents\Tests;
+namespace MCDev\IlluminateConnectionEvents\Tests {
 
-use Mockery as m;
-use ReflectionMethod;
-use Illuminate\Config\Repository;
-use Illuminate\Foundation\Application;
-use ShiftOneLabs\LaravelDbEvents\Tests\Stubs\PdoStub;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+    use Illuminate\Config\Repository;
+    use Illuminate\Contracts\Container\BindingResolutionException;
+    use Illuminate\Foundation\Application;
+    use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+    use MCDev\IlluminateConnectionEvents\Tests\Stubs\PdoStub;
+    use Mockery as m;
+    use ReflectionException;
+    use ReflectionMethod;
 
-class TestCase extends BaseTestCase
-{
-    public function createApplication()
+    class TestCase extends BaseTestCase
     {
-        $app = new Application();
-        $app->register('Illuminate\Database\DatabaseServiceProvider');
-        $app->register('ShiftOneLabs\LaravelDbEvents\LaravelDbEventsServiceProvider');
+        public function createApplication()
+        {
+            $app = new Application();
+            $app->register('Illuminate\Database\DatabaseServiceProvider');
+            $app->register('MCDev\IlluminateConnectionEvents\LaravelDbEventsServiceProvider');
 
-        // Laravel 4 uses the LoaderInterface, Laravel 5 does not.
-        if (interface_exists('Illuminate\Config\LoaderInterface')) {
-            $app->instance('config', $config = new Repository(m::mock('Illuminate\Config\LoaderInterface'), 'testing'));
-            $config->getLoader()->shouldReceive('load')->andReturn([]);
-        } else {
-            $app->instance('config', $config = new Repository([]));
+            $app->instance('config', new Repository([]));
+
+            $app['config']['database'] = [
+                'default' => 'valid',
+                'connections' => [
+                    'valid' => [
+                        'driver' => 'sqlite',
+                        'database' => ':memory:',
+                    ],
+                    'invalid' => [
+                        'driver' => 'sqlite',
+                        'database' => 'memory',
+                    ],
+                ],
+            ];
+
+            return $app;
         }
 
-        $app['config']['database'] = [
-            'default' => 'valid',
-            'connections' => [
-                'valid' => [
-                    'driver' => 'sqlite',
-                    'database' => ':memory:',
-                ],
-                'invalid' => [
-                    'driver' => 'sqlite',
-                    'database' => 'memory',
-                ],
-            ],
-        ];
+        protected function getConnection($connection = null)
+        {
+            return $this->app['db']->connection($connection);
+        }
 
-        return $app;
-    }
+        /**
+         * @throws BindingResolutionException
+         */
+        protected function getConnector($driver)
+        {
+            return $this->app->make('db.connector.' . $driver);
+        }
 
-    protected function getConnection($name = null)
-    {
-        return $this->app['db']->connection($name);
-    }
+        protected function getDbFactoryConnector($driver)
+        {
+            return $this->app['db.factory']->createConnector(['driver' => $driver]);
+        }
 
-    protected function getConnector($driver)
-    {
-        return $this->app->make('db.connector.'.$driver);
-    }
+        /**
+         * @throws BindingResolutionException
+         */
+        protected function bindMockedConnector($driver)
+        {
+            $original = $this->getConnector($driver);
 
-    protected function getDbFactoryConnector($driver)
-    {
-        return $this->app['db.factory']->createConnector(['driver' => $driver]);
-    }
+            $this->app->bind('db.connector.' . $driver, function () use ($original) {
+                $connector = m::mock(get_class($original))->shouldAllowMockingProtectedMethods()->makePartial();
+                if ($original->usingEvents()) {
+                    $connector->setEventDispatcher($original->getEventDispatcher());
+                }
 
-    protected function bindMockedConnector($driver)
-    {
-        $original = $this->getConnector($driver);
+                return $connector;
+            });
+        }
 
-        $this->app->bind('db.connector.'.$driver, function ($app) use ($original) {
-            $connector = m::mock(get_class($original))->shouldAllowMockingProtectedMethods()->makePartial();
-            if ($original->usingEvents()) {
-                $connector->setEventDispatcher($original->getEventDispatcher());
+        /**
+         * @throws BindingResolutionException
+         */
+        protected function getMockedConnector($driver, $withEvents = true)
+        {
+            $this->bindMockedConnector($driver);
+            $connector = $this->getConnector($driver);
+            if ($withEvents && !$connector->usingEvents() && $this->app->bound('events')) {
+                $connector->setEventDispatcher($this->app['events']);
             }
 
             return $connector;
-        });
-    }
-
-    protected function getMockedConnector($driver, $withEvents = true)
-    {
-        $this->bindMockedConnector($driver);
-        $connector = $this->getConnector($driver);
-        if ($withEvents && !$connector->usingEvents() && $this->app->bound('events')) {
-            $connector->setEventDispatcher($this->app['events']);
         }
 
-        return $connector;
-    }
+        /**
+         * @throws BindingResolutionException
+         */
+        protected function getPdoStubConnector($driver, $withEvents = true)
+        {
+            $connector = $this->getMockedConnector($driver, $withEvents);
+            $connector->shouldReceive('parentConnect')->andReturn(new PdoStub());
 
-    protected function getPdoStubConnector($driver, $withEvents = true)
-    {
-        $connector = $this->getMockedConnector($driver, $withEvents);
-        $connector->shouldReceive('parentConnect')->andReturn(new PdoStub());
+            return $connector;
+        }
 
-        return $connector;
-    }
+        /**
+         * @throws ReflectionException
+         */
+        protected function callRestrictedMethod($object, $method, array $args = [])
+        {
+            $reflectionMethod = new ReflectionMethod($object, $method);
+            $reflectionMethod->setAccessible(true);
 
-    protected function callRestrictedMethod($object, $method, array $args = [])
-    {
-        $reflectionMethod = new ReflectionMethod($object, $method);
-        $reflectionMethod->setAccessible(true);
-
-        return $reflectionMethod->invokeArgs($object, $args);
+            return $reflectionMethod->invokeArgs($object, $args);
+        }
     }
 }
