@@ -55,7 +55,7 @@ trait SupportsEvents
     }
 
     /**
-     * Fire the given event for the object.
+     * Dispatch the given event for the object.
      *
      * @param object $event
      * @param boolean $halt
@@ -67,7 +67,7 @@ trait SupportsEvents
             return true;
         }
 
-        $method = $halt ? 'until' : 'fire';
+        $method = $halt ? 'until' : 'dispatch';
 
         return $this->events->$method(get_class($event), $event);
     }
