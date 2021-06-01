@@ -2,7 +2,7 @@
 
 A support package that extends Illuminate Database package with pre/post connection events.
 
-This package is a downstream copy of on [laravel-db-events](https://github.com/shiftonelabs/laravel-db-events)
+This package is a downstream copy of [laravel-db-events](https://github.com/shiftonelabs/laravel-db-events)
 by [Patrick Carlo-Hickman](https://github.com/patrickcarlohickman) forked for direct maintenance and forward support for
 Laravel 7 and later.
 
